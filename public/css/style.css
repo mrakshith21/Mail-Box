@@ -1,0 +1,38 @@
+.center {
+    text-align: center;
+}
+
+.header{
+    color: white;
+}
+
+
+.overflow{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+    max-height: 10%;
+}
+.message{ 
+    height: 20%;
+    font: bold;
+    margin-top: 1px;
+    background-color: #424242;
+}
+
+.message:hover{
+    background-color: #616161;
+}
+
+.message:active{
+    background-color: #757575;
+}
+
+
+.messages-div{
+    position: relative;
+    max-width: 30%;
+    overflow: auto;
+
+}
