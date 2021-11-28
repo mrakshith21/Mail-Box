@@ -1,0 +1,90 @@
+.center {
+    text-align: center;
+}
+
+.header{
+    color: white;
+}
+
+
+.overflow{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+    max-height: 10%;
+}
+.message{ 
+    font: bold;
+    margin-top: 1px;
+}
+
+.message:hover{
+    background-color:#EEEEEE;
+}
+
+
+.message:focus{
+    background-color: #E0E0E0;
+}
+
+.inbox-label{
+    margin-top: 5%;
+    margin-left: 5%;
+}
+
+.inbox{
+    padding: 0px;
+    margin-left: 20%;
+}
+.messages-div{
+    max-height: 550px;
+    overflow-y: auto;
+    margin: 0px;
+}
+
+#display-message{
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    overflow-y: auto;
+}
+
+.logo-display-message{
+    border-radius: 50%;
+    background-color: #01579B;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 20px;
+    padding: 10px;
+    width: 35px;
+    height: 35px;
+}
+
+.inline-block{
+    display: inline-block;
+}
+.email-details{
+    margin-left: 10px;
+    margin-top: 20px;
+}
+
+.subject{
+    margin-bottom: 10px;
+}
+
+.from{
+    font: x-small;
+}
+
+.date{
+    font-size: small;
+}
+
+.from-date{
+    display: inline-block;
+    margin: auto;
+    padding: 10px;
+}
