@@ -15,24 +15,76 @@
     max-height: 10%;
 }
 .message{ 
-    height: 20%;
     font: bold;
     margin-top: 1px;
-    background-color: #424242;
 }
 
 .message:hover{
-    background-color: #616161;
-}
-
-.message:active{
-    background-color: #757575;
+    background-color:#EEEEEE;
 }
 
 
+.message:focus{
+    background-color: #E0E0E0;
+}
+
+.inbox-label{
+    margin-top: 5%;
+    margin-left: 5%;
+}
+
+.inbox{
+    padding: 0px;
+    margin-left: 20%;
+}
 .messages-div{
-    position: relative;
-    max-width: 30%;
-    overflow: auto;
+    max-height: 550px;
+    overflow-y: auto;
+    margin: 0px;
+}
 
+#display-message{
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    overflow-y: auto;
+}
+
+.logo-display-message{
+    border-radius: 50%;
+    background-color: #01579B;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 20px;
+    padding: 10px;
+    width: 35px;
+    height: 35px;
+}
+
+.inline-block{
+    display: inline-block;
+}
+.email-details{
+    margin-left: 10px;
+    margin-top: 20px;
+}
+
+.subject{
+    margin-bottom: 10px;
+}
+
+.from{
+    font: x-small;
+}
+
+.date{
+    font-size: small;
+}
+
+.from-date{
+    display: inline-block;
+    margin: auto;
+    padding: 10px;
 }
