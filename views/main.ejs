@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+ph61jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
@@ -17,8 +17,18 @@
     const API_KEY = "AIzaSyBHaqk2GKbbWoQW7exIXfWGsr1sndPDWf4";
     const CLIENT_ID = "713860404856-c59se7k5c66mr32cpufi1l7thfmmompn.apps.googleusercontent.com";
     const MAX_MESSAGES = 10;
+    let userMailAddress = '';
+    const labels = {
+        INBOX : "INBOX", 
+        SENT : "SENT", 
+        UNREAD : "UNREAD",
+        DRAFTS : "DRAFTS"
+    }
+
+    label = labels.INBOX;
 
     function authenticate() {
+        hideInboxLabel();
         return gapi.auth2.getAuthInstance()
             .signIn({scope: "https://mail.google.com/ https://www.googleapis.com/auth/gmail.compose https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.readonly"})
             .then(function() { console.log("Sign-in successful"); },
@@ -26,11 +36,20 @@
     }
 
     function loadClient() {
-        //const keys = getKeys();
         gapi.client.setApiKey(API_KEY);
         return gapi.client.load("https://gmail.googleapis.com/$discovery/rest?version=v1")
-            .then(function() { console.log("GAPI client loaded for API"); },
-                function(err) { console.error("Error loading GAPI client for API", err); });
+            .then(function() { console.log("GAPI client loaded for API"); 
+                                showInboxLabel();
+                                getEmailAddress(); },
+                function(err) { console.error("Error loading GAPI client for API", err); })
+                ;
+    }
+
+    function hideInboxLabel(){
+        document.getElementById("inbox-label").hidden = true;
+    }
+    function showInboxLabel(){
+        document.getElementById("inbox-label").hidden = false;
     }
 
     function handleSignoutClick(event) {
@@ -38,41 +57,63 @@
         console.log("Signed out");
     }
 
-    function getProfile() {
+    function getEmailAddress() {
 
         return gapi.client.gmail.users.getProfile({"userId" : 'me'})
             .then(function(response) {                
-                console.log(response.result);
+                userMailAddress = response.result.emailAddress;
             },
             function(err) { console.error("Execute error", err); });
     }
 
-    function fetchMessages(){
-            
-        return gapi.client.gmail.users.messages.list({"userId" : "me", 'labelIds': 'INBOX', 'maxResults': 10})
-        .then(function(response) {
-            let messages = response.result["messages"];
-            console.log(messages);
-            putMessages(messages);
-            
-            
-        });
-    }
-
-    function putMessages(messages){
-        
-        for(let i = 0; i < MAX_MESSAGES; i++){
-            const messageId = (messages[i]["id"]);
-            putMessage(messageId);
-            
+    function changeLabel(newLabel){
+        console.log(newLabel);
+        if(newLabel !== label){
+            label = newLabel;
+            console.log("Fetching " + label);
+            if(label == labels.DRAFTS){
+                fetchMessages('drafts');
+            }
+            else{
+                fetchMessages('messages');
+            }
             
         }
     }
 
-    function putMessage(messageId){
-        return gapi.client.gmail.users.messages.get({"userId" : 'me', "id" : messageId})
+    function fetchDrafts(){
+        return gapi.client.gmail.users.drafts.list({"userId" : "me"})
+        .then(function(response) {
+            let messages = response.result.drafts;
+            console.log(messages);
+            listMessages(messages);            
+        });
+    }
+
+    function fetchMessages(type='messages'){
+            
+        return gapi.client.gmail.users[type].list({"userId" : "me", 'labelIds' : label})
+        .then(function(response) {
+            let messages = response.result[type];
+            console.log(messages);
+            listMessages(messages, type);            
+        });
+    }
+
+    function listMessages(messages, type){
+        
+        for(let i = 0; i < messages.length; i++){
+            const messageId = (messages[i]["id"]);
+            listMessage(messageId, type);       
+            
+        }
+    }
+
+    function listMessage(messageId, type){
+        let messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML = "";
+        return gapi.client.gmail.users[type].get({"userId" : 'me', "id" : messageId})
             .then(function(response){
-                //console.log(response.result);
                 const snippet = response.result["snippet"];  
                 let from = "", subject = "";
                 response.result["payload"]["headers"].forEach(header => {
@@ -82,39 +123,43 @@
                     else if(header["name"] == "Subject"){
                         subject = header["value"];
                     }
-                });      
+                });   
+                // console.log("Id : " + messageId);  
+                // console.log("From : " + subject); 
+                // console.log("Subject : " + subject); 
+                // console.log("Snippet : " + snippet); 
                 let newMessage = document.createElement('button');
                 newMessage.type = 'button';
                 newMessage.onclick = function (){
                     console.log("Displaying message");
-                    return gapi.client.gmail.users.messages.get({"userId" : 'me', "id" : messageId})
+                    return gapi.client.gmail.users[type].get({"userId" : 'me', "id" : messageId})
                         .then(function(response){
-                            body = response.result;
-                            headers = body["payload"]["headers"];
+                            json = response.result;
+                            headers = json.payload.headers;
                             headerMap = {};
                             headers.forEach(header => {
                                 headerMap[header.name] = header.value;
                             });
-                            parts = body["payload"]["parts"];
-                            let messageHTML = "";
+                            
                             document.getElementById("display-message").innerHTML = 
                                                 '<div class="email-details">'
-                                                  + '<h5 class="subject">' + headerMap.Subject + '</h5>'
-                                                  + '<div class="logo-from-date">'
-                                                    + '<div class="logo-display-message my-auto">' + headerMap.From[0].toUpperCase() + '</div>'
-                                                    + '<div class="from-date ">'
+                                                    + '<h5 class="subject">' + headerMap.Subject + '</h5>'
+                                                    + '<div class="logo-from-date">'
+                                                        + '<div class="logo-display-message my-auto">' + headerMap.From[0].toUpperCase() + '</div>'
+                                                        + '<div class="from-date ">'
                                                         + '<div class="from">' + headerMap.From  + '</div>'
                                                         + '<div class="date">' + headerMap.Date + '</div>'
-                                                    + '</div>';
-                                                + '</div>';
-                                                
-                                                    
-                                                '</div>'
-                            parts.forEach(part => {
-                            if(part["mimeType"] == "text/html"){
-                                messageHTML += (atob(part["body"]["data"].replace(/-/g, '+').replace(/_/g, '/')))
+                                                    + '</div>'
+                                                + '</div>';      
+                            // parts.forEach(part => {
+                            // if(part["mimeType"] == "text/html"){
+                            //     messageHTML += (atob(part["body"]["data"].replace(/-/g, '+').replace(/_/g, '/')))
+                            // }
+                            // });
+                            let messageHTML = addMessagePart(json.payload);
+                            if(messageHTML.length == 0 && json.payload.mimeType == 'text/plain' && json.payload.body.data !== undefined){
+                                messageHTML = (atob(json.payload.body.data.replace(/-/g, '+').replace(/_/g, '/')));
                             }
-                            });
                             //console.log(messageHTML);
                             document.getElementById("display-message").innerHTML += messageHTML;
                         })
@@ -132,14 +177,69 @@
                 newMessage.appendChild(fromDiv);
                 newMessage.appendChild(subjectDiv);
                 newMessage.appendChild(snippetDiv);
-                document.getElementById('messages').append(newMessage);
-                console.log(newMessage.onclick.name);
+                messagesDiv.append(newMessage);
             })
+        
+            
             
     }
 
 
-    
+    function addMessagePart(messagePart){
+        let messageHTML = "";
+        //console.log(messagePart);
+        if(messagePart.body.data !== undefined && (messagePart.mimeType == "text/html")){
+            console.log("Yay text came");
+            messageHTML = (atob(messagePart.body.data.replace(/-/g, '+').replace(/_/g, '/')));
+            //console.log(messageHTML);
+        }
+        if(messagePart.parts !== undefined){
+            messagePart.parts.forEach(part => {
+                messageHTML += addMessagePart(part);
+            });
+        }
+        return messageHTML;
+    }
+   
+
+    function setUpMessageDivForSendDetails(){
+        let messageDiv = document.getElementById("display-message");
+        console.log(userMailAddress);
+        messageDiv.innerHTML = 
+        '<form onsubmit="return sendMail();">'
+        + '<div class="send-mail">'
+            + '<input readonly id="from-send-mail" class="send-mail-element " type="text" value="From : ' + userMailAddress + '"//>'
+            + '<div class="send-mail-element"><label>To: </label><input required id="to-send-mail" type="text" class=""></input></div>'
+            + '<input required id="subject-send-mail" type="text" class="send-mail-element"  placeholder="Subject"//><br>'
+            + '<textarea id="content-send-mail" type="text" class="send-mail-element send-mail-content"  placeholder="Content"> </textarea>'
+            + '<button type="submit" class="btn btn-secondary" >Send</button>'
+        + '</div>'
+        + '</form>'
+    }
+    function sendMail(){
+        console.log("Sending mail");
+        const to = document.getElementById("to-send-mail").value;
+        const subject = document.getElementById("subject-send-mail").value;
+        const content = document.getElementById("content-send-mail").value;
+        const message = "From: " + userMailAddress + "\r\n" + 
+                        "To: " + to + "\r\n" +
+                        "Subject: " + subject + "\r\n\r\n" +
+                        // 'Content-Type: text/plain; charset=utf-8\r\n' + 
+                        // 'MIME-Version: 1.0\r\n' +
+                        content;
+
+        const encodedMessage = btoa(message).replace(/\+/g, '-').replace(/\//g, '_');
+        gapi.client.gmail.users.messages.send({
+            userId: 'me',
+            resource: {
+                raw: encodedMessage
+            }
+        }).then(function (res) { console.log(res)},
+                function(err){ console.log(err)});
+        return false;
+
+    }
+
     gapi.load("client:auth2", function() {
         gapi.auth2.init({"client_id" : CLIENT_ID});
     });
@@ -152,25 +252,33 @@
     <div class="container-fluid">
         <!-- <h2 class="header center ">Mail Box</h2> -->
         <div class="row">
+            <div class="col menu">
+                <button type="button" class="btn btn-primary compose" onclick="setUpMessageDivForSendDetails()">Compose</button>
+                <div class="labels">
+                    <ol class="list-group">
+                        <button type="button" onclick="changeLabel('INBOX')" class="list-group-item list-group-item-action">Inbox</button>
+                        <button type="button" onclick="changeLabel('SENT')" class="list-group-item list-group-item-action">Sent</button>
+                        <button type="button" onclick="changeLabel('UNREAD')" class="list-group-item list-group-item-action">Unread</button>
+                        <button type="button" onclick="changeLabel('DRAFTS')" class="list-group-item list-group-item-action">Drafts</button>
+                    </ol>
+                </div>
+                
+            </div>
             <div class="col-4 body-background inbox">
-                <h6 class=" inbox-label">INBOX</h6>
+                <h6 id="inbox-label" class=" inbox-label">INBOX</h6>
                 <div class="messages-div list-group" id="messages">
                     <!-- <ol class="messages list-group " id="messages">
             
                     </ol> -->
                 </div>               
             </div>
-            <div class="col body-background">
-                <div id="display-message" class="display-message-div"></div>
+            <div class="col-5 outer-display-message body-background">
+                <div id="display-message" class="display-message-div">
+                    <img src="images.png" alt="">
+                </div>
             </div>
         </div>
         
     </div>
-
-    
-
-    <script>
-        
-    </script>
 </body>
 </html>

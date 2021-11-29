@@ -11,7 +11,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60%;
+    max-width: 100%;
     max-height: 10%;
 }
 .message{ 
@@ -35,7 +35,6 @@
 
 .inbox{
     padding: 0px;
-    margin-left: 20%;
 }
 .messages-div{
     max-height: 550px;
@@ -43,11 +42,13 @@
     margin: 0px;
 }
 
+.outer-display-message{
+    width: 550px;
+}
+
 #display-message{
-    display: flex;
-    flex-direction: column;
     height: 600px;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 .logo-display-message{
@@ -88,3 +89,61 @@
     margin: auto;
     padding: 10px;
 }
+
+.menu{
+    width: 200px;
+    height: 500px;
+}
+
+.send-mail{
+    margin-top: 30px;
+    padding: 10px;
+    padding-right: 20px;
+}
+
+.send-mail-element{
+    margin: 10px;
+    width: 100%;
+    border: none;
+    border-bottom: solid 1px #E0E0E0;
+}
+
+.send-mail-element:focus{
+    appearance: none;
+    outline: none;
+}
+
+.send-mail-element:active{
+    appearance: none;
+    outline: none;
+}
+
+.send-mail-content{
+    height: 340px;
+}
+
+
+input{
+    border: none;
+}
+
+input:focus{
+    appearance: none;
+    outline: none;
+}
+
+.compose{
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.labels{
+    margin-bottom: 30px;
+    
+}
+
+.logo{
+    font-size: 10em;
+    text-align: center;
+}
+
