@@ -1,0 +1,14 @@
+<div class="col menu full-height bg-light">
+    <button type="button" class="btn btn-primary compose" onclick="setUpMessageDivForSendDetails()">Compose</button>
+    <div class="labels">
+        <ol class="list-group">
+            <button type="button" onclick="changeLabel('INBOX')" class="list-group-item list-group-item-action">Inbox</button>
+            <button type="button" onclick="changeLabel('SENT')" class="list-group-item list-group-item-action">Sent</button>
+            <button type="button" onclick="changeLabel('UNREAD')" class="list-group-item list-group-item-action">Unread</button>
+            <button type="button" onclick="changeLabel('DRAFTS')" class="list-group-item list-group-item-action">Drafts</button>
+        </ol>
+    </div>
+    <div class="signout">
+        <button type="button" onclick="signOut()" class="btn btn-outline-danger">Sign Out</button>
+    </div>    
+</div>

@@ -179,28 +179,66 @@
         });
     }
 
-    function getDates(messages){
-        dates = {}
-        messages.forEach(message => {
-            gapi.client.gmail.users.messages.get({"userId" : 'me', "id" : message.id})
+    function getDate(messageId){
+        return gapi.client.gmail.users.messages.get({"userId" : 'me', "id" : messageId, format : 'minimal'})
             .then(function(response){
-                dates[message.id] = response.result.internalDate;
-            })
-        });
-        return dates;
+                return response.result.internalDate;
+            });        
     }
+
+    // async function getDates(messages){
+    //     dates = {}
+    //     messages.forEach(message => {
+    //         dates[message.id] = await getDate(message.id);
+    //     });
+    //     console.log("returning dates");
+    //     console.log(dates);
+    //     return dates;
+    // }
 
     function listMessages(messages, type){        
         console.log(messages);
-        dates = getDates(messages);
-        console.log(dates);
-        messages.sort(function(a, b) {dates[a.id] - dates[b.id]});
-        console.log("Ready to put messages");
-        console.log(messages);
-        for(let i = 0; i < messages.length; i++){
-            const messageId = (messages[i]["id"]);
-            listMessage(messageId, type);              
-        }
+        dates = {};
+        let promises = [];
+        messages.forEach(message => {
+            promises.push(getDate(message.id));
+        });
+        Promise.all(promises).then(function(values){
+            console.log(values);
+            for(let i = 0; i < messages.length; i++){
+                dates[messages[i].id] =parseInt( values[i]);
+            }
+            messages.forEach(message => {
+            console.log(message.id);
+            console.log(dates[message.id]);
+            })
+            console.log("Dates received sorted");
+            console.log(dates);
+            messages.sort(function(a) {-(dates[a.id])});
+            console.log("Sorted messages");
+            console.log("Ready to put messages");
+            console.log(messages);
+            console.log(dates);
+            messages.forEach(message => {
+                console.log(message.id, typeof(message.id));
+                console.log(dates[message.id]);
+            })
+            for(let i = 0; i < messages.length; i++){
+                const messageId = (messages[i]["id"]);
+                listMessage(messageId, type);              
+            }
+            // console.log("Printing romises");
+            // console.log(values);
+        });
+        // console.log("printing from date", Object.keys(dates));
+        // for(d in dates){
+        //     console.log(d, dates[d]);
+        // }
+        // console.log(dates['17d7ba3d4b805484']);
+        // for(m in messages){
+        //     console.log(typeof(m));
+        // }
+        
     }
 
     function listMessage(messageId, type){
@@ -368,7 +406,6 @@
         <div class="modal fade" tabindex="-1" id="invalid-message-modal" role="dialog">
             <div class="modal-dialog">
             
-              <!-- Modal content-->
               <div class="modal-content">
                 <div class="modal-header" style="padding: 10px 20px;">
                     <h5><i class="bi bi-exclamation-triangle fa-2x"></i></h5>
@@ -377,7 +414,7 @@
                 </div>
                 <div class="modal-body"> 
                         <div class="alert alert-danger" role="alert">
-                            <p>Please correct a valid recipient's address</p>
+                            <p>Please enter a valid recipient's address</p>
                          </div>
                 </div>
               </div>
@@ -385,21 +422,9 @@
             </div>
           </div>
         <div class="row full-height ">
-            <div class="col menu full-height bg-light">
-                <button type="button" class="btn btn-primary compose" onclick="setUpMessageDivForSendDetails()">Compose</button>
-                <div class="labels">
-                    <ol class="list-group">
-                        <button type="button" onclick="changeLabel('INBOX')" class="list-group-item list-group-item-action">Inbox</button>
-                        <button type="button" onclick="changeLabel('SENT')" class="list-group-item list-group-item-action">Sent</button>
-                        <button type="button" onclick="changeLabel('UNREAD')" class="list-group-item list-group-item-action">Unread</button>
-                        <button type="button" onclick="changeLabel('DRAFTS')" class="list-group-item list-group-item-action">Drafts</button>
-                    </ol>
-                </div>
-                <div class="signout">
-                    <button type="button" onclick="signOut()" class="btn">Sign Out</button>
-                </div>
-                
-            </div>
+
+            <%- include('partials/sidebar'); %>
+
             <div class="col-4 body-background inbox">
                 <h6 id="mail-label" class=" inbox-label">INBOX</h6>
                 <div class="messages-div list-group" id="messages">
