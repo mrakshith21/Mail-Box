@@ -19,9 +19,12 @@ body {
     max-width: 100%;
 }
 
+
 .date-time{
     font-weight: 400;
     font-size: small !important;
+    padding: 5px;
+    margin: 0px;
 
 }
 
@@ -31,7 +34,12 @@ body {
 }
 
 .message-overview{
-    font-weight: 600;
+    font-weight: 400;
+    color: black;
+}
+
+.message-overview:focus{
+    font-weight: 500;
 }
 
 .message{ 
