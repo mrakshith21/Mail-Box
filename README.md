@@ -1,6 +1,6 @@
 # MAIL BOX
 
-A web aplpication which fetches mails using the 
+A web application which fetches mails using the 
 [Gmail API](https://developers.google.com/gmail/api).
 
 To run this application you will need the following prerequisites
