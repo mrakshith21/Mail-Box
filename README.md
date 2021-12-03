@@ -1,6 +1,6 @@
 # MAIL BOX
 
-A simple web aplpication which fetches mails using the 
+A web aplpication which fetches mails using the 
 [Gmail API](https://developers.google.com/gmail/api).
 
 To run this application you will need the following prerequisites
@@ -9,17 +9,27 @@ To run this application you will need the following prerequisites
 ***Note that for this apllication, you should enable the Gmail API***
 - A Google account with Gmail enabled
 
-After enabling the Gmail API you will get authorization codes
-called the CLIENT_ID and API_KEY
 
 ### Set Up
 1. Download and exract the zip file or clone this repo
-2. In the file ```app.js``` replace ```<YOUR_CLIENT_ID>``` with the client ID you created.
+2. In the file ```javascript/keys.js``` replace ```<YOUR_CLIENT_ID>``` with the client ID you created.
 3. Also replace  ```<YOUR_API_KEY>``` with the API key you created.
 
 ### Run 
 1. Navigate to the directory ```Mail-Box``` in the downloaded code.
-2. Run the following command in the terminal to start the application
+2. Install node modules
+    ```npm install``` 
+3. Start the application
     ```node app.js```
-3. Navigate to ```http://localhost:8887/mail-box``` in your browswer
+4. Navigate to ```http://localhost:8887/mail-box``` in your browswer
 
+### Features supported
+1. Fetch mails sorted by date
+2. Fetch inbox, unread, and sent mails
+2. Send mails with plain text content
+
+### Demo of set up and working
+[Video](https://drive.google.com/file/d/1SbXe54R80KhGswUbs0O6aVoLqLnzOKtA/view?usp=sharing)
+
+### References
+- [Quickstart JS](https://developers.google.com/gmail/api/quickstart/js)
